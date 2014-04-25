@@ -1,15 +1,82 @@
-## Put comments here that give an overall description of what your
-## functions do
+###################################################
+# Week 3 Assignment
+# Kiichi Takeuchi
+# 4/25/2014
+# Calculate Inverse Matrix using caching mechanism
+###################################################
 
-## Write a short comment describing this function
-
-makeCacheMatrix <- function(x = matrix()) {
-
+#This function creates a matrix with caching mechanism
+makeCacheMatrix <- function(mData = matrix()) {
+  mFunc <- NULL
+  
+  # Get the cached data
+  get <- function(){
+    mData
+  }
+  
+  # Set the cache value & reset the function
+  set <- function(inVal){
+    #Initializing those member variables
+    #in outside scope
+    mData <<- inVal
+    mFunc <<- NULL
+  }
+  
+  # Get the reference to the function 
+  getSolve <- function() {
+    mFunc
+  }
+  
+  # Set the function
+  setSolve <- function(inFunc) {
+    mFunc <<-inFunc
+  } 
+  
+  #expose member variables as the list
+  list(
+    get=get,
+    set=set,
+    getSolve=getSolve,
+    setSolve=setSolve
+  )  
 }
 
 
-## Write a short comment describing this function
-
-cacheSolve <- function(x, ...) {
-        ## Return a matrix that is the inverse of 'x'
+# This is a wrapper function of solve() 
+# which takes the chached matrix in the argument
+# This version of solve function will avoid
+# re-calculating the inverse of the input matrix
+cacheSolve <- function(cacheMatrix, ...) {
+  
+  result <- cacheMatrix$getSolve()
+  if (!is.null(result)){
+    message("Getting cahced data")
+    return(result)
+  }
+  
+  result <- solve(cacheMatrix$get(),...)
+  cacheMatrix$setSolve(result)
+  result  
 }
+
+
+#------------------------------------------
+# Test Code : A * A-1 = I
+#------------------------------------------
+mat_cache<-makeCacheMatrix(matrix(c(4,3,3,2),2,2) )
+print("A --------------------")
+mat<-mat_cache$get()
+print(mat)
+print("A-1 --------------------")
+mat_inv <- cacheSolve(mat_cache)
+print(mat_inv)
+print("I --------------------")
+# Should get Identity matrix
+print(mat%*%mat_inv)
+#       [,1] [,2]
+# [1,]    1    0
+# [2,]    0    1
+
+
+#try this in console, and you should get the message about cache
+#> cacheSolve(mat)
