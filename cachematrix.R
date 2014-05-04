@@ -97,6 +97,6 @@ cacheSolve <- function(cacheMatrix, ...) {
 
 #------
 #try this in console, and you should get the message about cache
-#> cacheSolve(mat)
+#> cacheSolve(mat_cache)
 
 
